@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_blue_dark">
+
+    <TextView
+        android:id="@+id/groupgroup_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Group"
+        android:textSize="30sp"
+        android:layout_marginTop="10sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/groupgroup_GroupName"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_marginTop="40sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_title"
+
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/groupgroup_Class"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_GroupName"
+
+        android:ems="10"
+        android:hint="Class"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/groupgroup_Purpose"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_Class"
+
+        android:ems="10"
+        android:hint="Purpose"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/groupgroup_DateTime"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_Purpose"
+
+        android:ems="10"
+        android:hint="Date/Time"
+        android:inputType="datetime"/>
+
+    <EditText
+        android:id="@+id/groupgroup_Location"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_DateTime"
+
+        android:ems="10"
+        android:hint="Location"
+        android:inputType="text"/>
+
+    <EditText
+        android:id="@+id/groupgroup_PartySize"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/groupgroup_Location"
+
+        android:ems="10"
+        android:hint="Party Size"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/groupgroup_CreateBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/groupgroup_PartySize"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20sp"
+
+        android:backgroundTint="@android:color/black"
+        android:textColor="@android:color/darker_gray"
+        android:text="Create New Group"
+        android:textSize="20sp"/>
+
+</RelativeLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bnmnavigation_search"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="Search"
+        android:enabled="true"/>
+
+    <item
+        android:id="@+id/bnmnavigation_groups"
+        android:icon="@drawable/ic_baseline_people_24"
+        android:title="Groups"
+        android:enabled="true"/>
+
+    <item
+        android:id="@+id/bnmnavigation_profile"
+        android:icon="@drawable/ic_baseline_more_horiz_24"
+        android:title="Profile"
+        android:enabled="true"/>
+
+</menu>

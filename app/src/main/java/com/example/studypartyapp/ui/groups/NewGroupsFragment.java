@@ -101,6 +101,7 @@ public class NewGroupsFragment extends Fragment {
             } while (exists(partyID));
 
             //TODO randomly create and verify partyID not taken
+            
             Log.d("debug", "In NewGroupsFragment: in CreateNew after exists call");
             Log.d("debug", "idNo: " + idNo);
             ArrayList<String> tray = stringCallable(partyID, 1, classs, partysize, purpose,

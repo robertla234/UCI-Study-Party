@@ -116,12 +116,7 @@ public class MainFragNew extends Fragment {
 
     private boolean SendNewUser(String idNo, String password,
                                       String firstName, String lastName, String major){
-        //TODO send data to DB
-        //String msgToSend = "USE StudyParty; INSERT INTO User ([ {\"idNo\":" + idNo + ", \"passWord\":\"" + password + "\", \"firstName\":\"" + firstName + "\", \"lastName\":\"" + lastName + "\", \"major\":\"" + major + "\"} ]);";
-
-        //TODO check for data sent
-        //String msgToCheck = "USE StudyParty; SELECT VALUE user FROM User user WHERE user.idNo = " + idNo + " AND passWord = \"" + password + "\";";
-
+        //calls StringCallable to check and create new acc if none exist w ID
         ArrayList<String> tray = stringCallable(idNo, password, firstName, lastName, major);
         if (tray == null)
             return false;
@@ -219,6 +214,17 @@ class socketGrabCallableNew implements Callable<String> {
                     "\", \"major\": \"" + major + "\" }"
                     + " ]);";
 
+            /*
+            String data = "use StudyParty; INSERT INTO User ([ " +
+                    "{\"idNo\": " + idNo +
+                    ", \"passWord\": \"" + password +
+                    "\" ,\"email\": \"" + email +
+                    "\" , \"firstName\": \"" + firstName +
+                    "\" , \"lastName\": \"" + lastName +
+                    "\", \"major\": \"" + major + "\" }"
+                    + " ]);";
+             */
+
             Log.d("debug", "sending:" + data);
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");
@@ -310,8 +316,6 @@ class socketGrabCallableNew implements Callable<String> {
         }
 
         //process response to see if idNo exists
-
-
         return checkStringReturn(Endresult);
     }
 

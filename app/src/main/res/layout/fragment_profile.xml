@@ -62,20 +62,32 @@
         android:text="MAJOR"
         android:textSize="18sp" />
 
-
-
     <Button
         android:id="@+id/profile_fragment_groupjoined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_major"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
 
         android:backgroundTint="@android:color/black"
         android:textColor="@android:color/darker_gray"
         android:text="Groups Joined"
         android:textSize="20sp"/>
+
+    <ScrollView
+        android:id="@+id/scroll_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profile_fragment_groupjoined">
+
+        <LinearLayout
+            android:id="@+id/scroll_fragment_scrolllistlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="4sp"
+            android:layout_centerHorizontal="true" />
+
+    </ScrollView>
 
 
 </RelativeLayout>

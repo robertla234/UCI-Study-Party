@@ -232,8 +232,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private ArrayList<String> asterixDBReturn(String input, int pathID){
-        //TODO if (pathID == 1){ }
-
         //Takes input from AsterixDB and parses it
         //Itemizes parts into ArrayList
         ArrayList<String> results = new ArrayList<String>();

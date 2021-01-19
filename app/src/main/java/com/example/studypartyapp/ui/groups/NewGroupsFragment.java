@@ -271,6 +271,10 @@ class socketGrabCallableNewGroup implements Callable<String> {
                     "INSERT INTO isGuest ([ " +
                     "{\"idNo\": " + hostId +
                     ", \"partyID\": " + partyid + " }"
+                    + " ]);" +
+                    "INSERT INTO Class ([ " +
+                    "{\"class\": " + Class +
+                    ", \"partyID\" : " + partyid + " }"
                     + " ]);";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")

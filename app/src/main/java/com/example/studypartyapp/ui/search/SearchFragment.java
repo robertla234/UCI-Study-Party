@@ -70,6 +70,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
 
         //calls for list of Class from DB
         ArrayList<String> classArray = stringCallable(idNo, 0);
+        classArray = processingClass(classArray);
 
         SearchList.removeAllViews();
         for (int i = 0; i < classArray.size(); i++){
@@ -82,9 +83,9 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             params.setMargins(0, 10, 0, 10);
 
             //Set Text and Content Settings for Button
-            String processName[] = processingName(classArray.get(i), idNo, 0);
+            String processName = classArray.get(i);
 
-            classBtn.setText(processName[0]); // replace w/ setString
+            classBtn.setText(processName); // replace w/ setString
             classBtn.setId(i); //Button with Unique ID
             classBtn.setBackgroundColor(Color.DKGRAY);
             classBtn.setTextColor(Color.WHITE);
@@ -94,9 +95,8 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                 @Override
                 public void onClick(View view){
                     //Group Info Requests
-                    //TODO Possible new ID with distinct URL/Port data
-                    Toast.makeText(getActivity().getBaseContext(), ("Working. " + processName[0] + "."), Toast.LENGTH_SHORT).show();
-                    String partyID = processName[1]; //TODO parse partyID from tempArray[i]
+                    //TODO Change View to All Groups of That Class
+                    String Class = processName;
                 }
             });
 
@@ -106,55 +106,29 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         return root;
     }
 
-    private String[] processingName(String nameInput, String idNo, int err){
-        //TODO change to fit and REMOVE ERR
+    private String processingName(String nameInput){
         //changes input DB string to readable details of Study Party
         //Input Format: (Sample)
         //{ "class": "Testingology 112", "party": [ 6 ] }
         //{ "class": "Testingology 110", "party": [ 8, 9, 7 ] }
         //Output Format:
-        //  CLASS PURPOSE at TIME \n at LOCATION
-        String nameInputParse = nameInput.substring(23);
-        String[] output = new String[2];
-        if (err == 0)
-            return output;
+        //
+        return nameInput.substring(12, nameInput.indexOf(",") - 1);
+    }
 
-        String[] keyValuePairs = nameInput.split(",");
-        Map<String,String> map = new HashMap<>();
-        for (String pair : keyValuePairs){
-            String[] entry = pair.split(":");
-            map.put(entry[0].trim(), entry[1].trim());
+    private ArrayList<String> processingClass(ArrayList<String> classArray){
+        ArrayList<String> output = new ArrayList<>();
+
+       output.add(processingName(classArray.get(0)));
+        for (int i = 1; i < classArray.size(); i++){
+            String fill = processingName(classArray.get(i));
+            if (!output.contains(fill)){
+                output.add(fill);
+                Log.d("debug", "In SearchFragment: in processingClass");
+                Log.d("debug", "fill:"+ fill);
+            }
         }
 
-        String Class = map.get("\"class\"");
-        String Purpose = map.get("\"purpose\"");
-        String MeetTime = map.get("\"meetTime\"");
-        String Location = map.get("\"location\"");
-        String Size = map.get("\"size\"");
-        String hostID = map.get("\"hostID\"");
-
-        if (Class.length() != 1)
-            Class = Class.substring(1, Class.length() - 1);
-        if (Purpose.length() != 1)
-            Purpose = Purpose.substring(1, Purpose.length() - 1);
-        if (Location.length() != 1)
-            Location = Location.substring(1, Location.length() - 1);
-        if (hostID.length() != 1)
-            hostID = hostID.substring(0, hostID.length() - 2);
-
-        Log.d("debug", "host ID: " + hostID);
-        Log.d("debug", Class + " " + Purpose + " " + MeetTime + " " + Location + " " + Size);
-
-        String placeHold = Class + " " + Purpose + " at " + MeetTime + ":00\n" +
-                Location + "\n" +
-                "People in Party: " + Size;
-        if (hostID.equals(idNo))
-            placeHold = Class + " " + Purpose + " at " + MeetTime + ":00 (HOST)\n" +
-                    Location + "\n" +
-                    "People in Party: " + Size;
-
-        output[0] = placeHold;
-        output[1] = map.get("\"partyID\"");
         return output;
     }
 

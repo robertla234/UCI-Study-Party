@@ -69,8 +69,8 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         SearchList = root.findViewById(R.id.search_fragment_searchlistlist);
 
         //calls for list of Class from DB
-        ArrayList<String> classArray = stringCallable(idNo, 0);
-        classArray = processingClass(classArray);
+        ArrayList<String> classArray = stringCallable(idNo, "", 0);
+        classArray = processingClass(classArray, idNo,0);
 
         SearchList.removeAllViews();
         for (int i = 0; i < classArray.size(); i++){
@@ -97,6 +97,43 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                     //Group Info Requests
                     //TODO Change View to All Groups of That Class
                     String Class = processName;
+                    ProfileTitle.setText("Join a Group");
+
+                    //calls for list of Class from DB
+                    ArrayList<String> classArray = stringCallable(idNo, Class, 1);
+                    classArray = processingClass(classArray, idNo,1);
+                    //classArray.removeAll(classArray);
+
+                    SearchList.removeAllViews();
+                    for (int i = 0; i < classArray.size(); i++){
+                        //CreateNewButton
+                        final Button classBtn = new Button(root.getContext());
+
+                        //Set Margins and Parameters between Buttons
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(0, 10, 0, 10);
+
+                        //Set Text and Content Settings for Button
+                        String processName = classArray.get(i);
+
+                        classBtn.setText(processName); // replace w/ setString
+                        classBtn.setId(i); //Button with Unique ID
+                        classBtn.setBackgroundColor(Color.DKGRAY);
+                        classBtn.setTextColor(Color.WHITE);
+
+                        //Control what Button does on Click
+                        classBtn.setOnClickListener(new View.OnClickListener(){
+                            @Override
+                            public void onClick(View view){
+                                //Group Info Requests
+                                //TODO Send Join Command
+                                Toast.makeText(getActivity().getBaseContext(), ("TEST12"), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        SearchList.addView(classBtn, params);
+                    }
                 }
             });
 
@@ -106,22 +143,70 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         return root;
     }
 
-    private String processingName(String nameInput){
-        //changes input DB string to readable details of Study Party
-        //Input Format: (Sample)
-        //{ "class": "Testingology 112", "party": [ 6 ] }
-        //{ "class": "Testingology 110", "party": [ 8, 9, 7 ] }
-        //Output Format:
-        //
-        return nameInput.substring(12, nameInput.indexOf(",") - 1);
+    private String processingName(String nameInput, String idNo, int pathID){
+        if (pathID == 0) {
+            //changes input DB string to readable details of Study Party
+            //Input Format: (Sample)
+            //{ "class": "Testingology 112", "party": [ 6 ] }
+            //{ "class": "Testingology 110", "party": [ 8, 9, 7 ] }
+            //Output Format:
+            //
+            return nameInput.substring(12, nameInput.indexOf(",") - 1);
+        }
+        else if (pathID == 1){
+            //Input Format: (Sample)
+            //{ "party": { "partyID": 5, "class": "Testingology 3", "size": 2, "purpose": "Quiz", "location": "Online", "meetTime": 14, "hostID": 9 }
+            //{ "party": { "partyID": 6, "class": "Testingology 112", "size": 5, "purpose": "Test", "location": "Online", "meetTime": 18, "hostID": 9 }
+            //
+            //{ "party": { "partyID": 1, "class": "Testingism", "size": 6, "purpose": "Final", "location": "Online", "meetTime": 11, "hostID": 8 }
+            //Output Format:
+            //
+            nameInput = nameInput.substring(12, nameInput.length() - 2);
+
+            String[] keyValuePairs = nameInput.split(",");
+            Map<String,String> map = new HashMap<>();
+            for (String pair : keyValuePairs){
+                String[] entry = pair.split(":");
+                map.put(entry[0].trim(), entry[1].trim());
+            }
+
+            String Class = map.get("\"class\"");
+            String Purpose = map.get("\"purpose\"");
+            String MeetTime = map.get("\"meetTime\"");
+            String Location = map.get("\"location\"");
+            String Size = map.get("\"size\"");
+            String hostID = map.get("\"hostID\"");
+
+            if (Class.length() != 1)
+                Class = Class.substring(1, Class.length() - 1);
+            if (Purpose.length() != 1)
+                Purpose = Purpose.substring(1, Purpose.length() - 1);
+            if (Location.length() != 1)
+                Location = Location.substring(1, Location.length() - 1);
+            if (hostID.length() != 1)
+                hostID = hostID.substring(0, hostID.length() - 2);
+
+            Log.d("debug", "host ID: " + hostID);
+            Log.d("debug", Class + " " + Purpose + " " + MeetTime + " " + Location + " " + Size);
+
+            String placeHold = Class + " " + Purpose + " at " + MeetTime + ":00\n" +
+                    Location + "\n" +
+                    "People in Party: " + Size;
+            if (hostID.equals(idNo))
+                placeHold = "ALREADY IN THIS GROUP";
+            return placeHold;
+        }
+
+        return "";
     }
 
-    private ArrayList<String> processingClass(ArrayList<String> classArray){
+    private ArrayList<String> processingClass(ArrayList<String> classArray, String idNo, int pathID){
+        Log.d("debug", "In SearchFragment: in processingClass -> path " + Integer.toString(pathID));
         ArrayList<String> output = new ArrayList<>();
 
-       output.add(processingName(classArray.get(0)));
+        output.add(processingName(classArray.get(0), idNo, pathID));
         for (int i = 1; i < classArray.size(); i++){
-            String fill = processingName(classArray.get(i));
+            String fill = processingName(classArray.get(i), idNo, pathID);
             if (!output.contains(fill)){
                 output.add(fill);
                 Log.d("debug", "In SearchFragment: in processingClass");
@@ -132,13 +217,13 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         return output;
     }
 
-    private ArrayList<String> stringCallable(String idNo, int pathID){
+    private ArrayList<String> stringCallable(String use1, String use2, int pathID){
         //setup for Socket retrieval
         ArrayList<String> endinG = new ArrayList<String>();
 
         ThreadPoolExecutor executor= (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
         List<Future<String>> retList = new ArrayList<>();
-        socketGrabCallableSearch trying = new socketGrabCallableSearch(idNo, pathID);
+        socketGrabCallableSearch trying = new socketGrabCallableSearch(use1, use2, pathID);
         Future<String> reting = executor.submit(trying);
         retList.add(reting);
 
@@ -153,14 +238,12 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         executor.shutdown();
 
         if (ending1.indexOf("success") != -1)
-            endinG = asterixDBReturn(ending1, pathID);
+            endinG = asterixDBReturn(ending1);
 
         return endinG;
     }
 
-    private ArrayList<String> asterixDBReturn(String input, int pathID){
-        //TODO if (pathID == 1){ }
-
+    private ArrayList<String> asterixDBReturn(String input){
         //Takes input from AsterixDB and parses it
         //Itemizes parts into ArrayList
         ArrayList<String> results = new ArrayList<String>();
@@ -207,10 +290,12 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
 class socketGrabCallableSearch implements Callable<String> {
     private String retString;
     private int pathId;
+    private String use2;
 
-    public socketGrabCallableSearch(String idNo, int pathID){
+    public socketGrabCallableSearch(String idNo, String use2, int pathID){
         this.retString = idNo;
         this.pathId = pathID;
+        this.use2 = use2;
     }
 
     @Override
@@ -218,7 +303,7 @@ class socketGrabCallableSearch implements Callable<String> {
         if (pathId == 0)
             return startString(retString);
         else if (pathId == 1)
-            return groupString(retString);
+            return groupString(retString, use2);
         return startString(retString);
     }
 
@@ -277,7 +362,7 @@ class socketGrabCallableSearch implements Callable<String> {
         return Endresult;
     }
 
-    private String groupString(String idNo) throws InterruptedException {
+    private String groupString(String idNo, String Class) throws InterruptedException {
         Log.d("debug", "In SearchFragment: in groupString Thread run");
         Socket s;
         DataOutputStream dos;
@@ -289,11 +374,12 @@ class socketGrabCallableSearch implements Callable<String> {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
             String data = "use StudyParty; " +
-                    "SELECT guest.idNo AS id, " +
-                    "(SELECT VALUE party FROM Party party " +
-                    "WHERE party.partyID = guest.partyID) AS party " +
-                    "FROM isGuest guest " +
-                    "WHERE guest.idNo = " + idNo + ";";
+                    "SELECT party AS party, " +
+                    "(SELECT VALUE guest FROM isGuest guest " +
+                    "WHERE guest.partyID = party.partyID " +
+                    "AND guest.idNO != " + idNo + ") AS guest " +
+                    "FROM Party party " +
+                    "WHERE party.class = \"" + Class + "\";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

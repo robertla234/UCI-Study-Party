@@ -134,6 +134,21 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
 
                         SearchList.addView(classBtn, params);
                     }
+
+                    final Button subscribeBtn = new Button(root.getContext());
+                    subscribeBtn.setText("Know when " + Class + " groups are made.");
+                    subscribeBtn.setId(classArray.size());
+                    subscribeBtn.setBackgroundColor(Color.GRAY);
+                    subscribeBtn.setTextColor(Color.WHITE);
+
+                    subscribeBtn.setOnClickListener(new View.OnClickListener(){
+                       @Override
+                       public void onClick(View view){
+                           //TODO Send Subscribe Request
+                           Toast.makeText(getActivity().getBaseContext(), ("Subscribe pressed."), Toast.LENGTH_SHORT).show();
+                       }
+                    });
+                    SearchList.addView(subscribeBtn, params);
                 }
             });
 

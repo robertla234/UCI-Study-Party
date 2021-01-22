@@ -170,7 +170,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         }
         else if (pathID == 1){
             //Input Format: (Sample)
-            //{ "party": { "partyID": 5, "class": "Testingology 3", "size": 2, "purpose": "Quiz", "location": "Online", "meetTime": 14, "hostID": 9 }
+            //{ "party": { "partyID": 5, "class": "Testingology 3", "size": 2, "purpose": "Quiz", "location": "Online", "meetTime": 14, "hostID": 9 }, "guest": [  ] }
             //{ "party": { "partyID": 6, "class": "Testingology 112", "size": 5, "purpose": "Test", "location": "Online", "meetTime": 18, "hostID": 9 }
             //
             //{ "party": { "partyID": 1, "class": "Testingism", "size": 6, "purpose": "Final", "location": "Online", "meetTime": 11, "hostID": 8 }
@@ -183,6 +183,13 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             for (String pair : keyValuePairs){
                 String[] entry = pair.split(":");
                 map.put(entry[0].trim(), entry[1].trim());
+            }
+
+            String guests = map.get("\"guest\"");
+            Log.d("debug", "guest: " + guests);
+            if (guests.equals("[  ]")){
+                Log.d("debug", "No guests. ALREADY IN GROUP");
+                //return "ALREADY IN THIS GROUP";
             }
 
             String Class = map.get("\"class\"");
@@ -207,8 +214,10 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             String placeHold = Class + " " + Purpose + " at " + MeetTime + ":00\n" +
                     Location + "\n" +
                     "People in Party: " + Size;
-            if (hostID.equals(idNo))
+            if (hostID.equals(idNo)){
                 placeHold = "ALREADY IN THIS GROUP";
+                Log.d("debug", "------ PASSES PASSES PASSES PASSES PASSES PASSES ------");
+            }
             return placeHold;
         }
 
@@ -253,12 +262,12 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         executor.shutdown();
 
         if (ending1.indexOf("success") != -1)
-            endinG = asterixDBReturn(ending1);
+            endinG = asterixDBReturn(ending1, pathID);
 
         return endinG;
     }
 
-    private ArrayList<String> asterixDBReturn(String input){
+    private ArrayList<String> asterixDBReturn(String input, int pathID){
         //Takes input from AsterixDB and parses it
         //Itemizes parts into ArrayList
         ArrayList<String> results = new ArrayList<String>();
@@ -277,6 +286,8 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         int finwhatsLeft = whatsLeft.length() - 1;
         int openParIndex = whatsLeft.indexOf("{");
         int closeParIndex = whatsLeft.indexOf("}");
+        if (pathID == 1)
+            closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
         String saveStr = "";
         int iteration = 1;
 
@@ -291,6 +302,8 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             }
             openParIndex = whatsLeft.indexOf("{");
             closeParIndex = whatsLeft.indexOf("}");
+            if (pathID == 1)
+                closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
             finwhatsLeft = whatsLeft.length() - 1;
         }
 
@@ -392,7 +405,7 @@ class socketGrabCallableSearch implements Callable<String> {
                     "SELECT party AS party, " +
                     "(SELECT VALUE guest FROM isGuest guest " +
                     "WHERE guest.partyID = party.partyID " +
-                    "AND guest.idNO != " + idNo + ") AS guest " +
+                    "AND guest.idNo != " + idNo + ") AS guest " +
                     "FROM Party party " +
                     "WHERE party.class = \"" + Class + "\";";
 

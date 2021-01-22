@@ -171,7 +171,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         else if (pathID == 1){
             //Input Format: (Sample)
             //{ "party": { "partyID": 5, "class": "Testingology 3", "size": 2, "purpose": "Quiz", "location": "Online", "meetTime": 14, "hostID": 9 }, "guest": [  ] }
-            //{ "party": { "partyID": 6, "class": "Testingology 112", "size": 5, "purpose": "Test", "location": "Online", "meetTime": 18, "hostID": 9 }
+            //{ "party": { "partyID": 7, "class": "Testingology 110", "size": 7, "purpose": "Test", "location": "Online", "meetTime": 8, "hostID": 9 }, "guest": [ { "idNo": 9, "partyID": 7 }
             //
             //{ "party": { "partyID": 1, "class": "Testingism", "size": 6, "purpose": "Final", "location": "Online", "meetTime": 11, "hostID": 8 }
             //Output Format:

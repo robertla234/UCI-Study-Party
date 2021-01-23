@@ -62,7 +62,7 @@
         android:inputType="text"/>
 
     <EditText
-        android:id="@+id/new_user_Major"
+        android:id="@+id/new_user_Email"
         android:layout_width="match_parent"
         android:layout_height="60sp"
 
@@ -71,6 +71,21 @@
 
         android:layout_centerHorizontal="true"
         android:layout_below="@id/new_user_LastName"
+
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:id="@+id/new_user_Major"
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+
+        android:layout_marginLeft="10sp"
+        android:layout_marginRight="10sp"
+
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/new_user_Email"
 
         android:ems="10"
         android:hint="Major"

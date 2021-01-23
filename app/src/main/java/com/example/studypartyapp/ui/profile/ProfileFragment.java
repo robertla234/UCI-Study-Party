@@ -136,21 +136,24 @@ public class ProfileFragment extends Fragment {
         String result = "";
         int start = input.indexOf(":");
         int end = input.indexOf(",");
-        //Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
+        Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
         start = input.indexOf(":", end);
         end = input.indexOf(",", end + 1);
-        //Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
+        Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
         start = input.indexOf(":", end);
         end = input.indexOf(",", end + 1);
-        //Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
+        Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
+        start = input.indexOf(":", end);
+        end = input.indexOf(",", end + 1);
+        Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
         result = input.substring(start + 3, end - 1);
-        //Log.d("debug", "results are " + result);
+        Log.d("debug", "results are " + result);
 
         start = input.indexOf(":", end);
         end = input.indexOf(",", end + 1);
-        //Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
+        Log.d("debug", Integer.toString(start) + " " + Integer.toString(end));
         result = result + " " + input.substring(start + 3, end - 1);
-        //Log.d("debug", "results are " + result);
+        Log.d("debug", "results are " + result);
 
         return result;
     }
@@ -186,8 +189,6 @@ public class ProfileFragment extends Fragment {
             Purpose = Purpose.substring(1, Purpose.length() - 1);
         if (Location.length() != 1)
             Location = Location.substring(1, Location.length() - 1);
-        if (hostID.length() != 1)
-            hostID = hostID.substring(0, hostID.length() - 2);
 
         Log.d("debug", "host ID: " + hostID);
         Log.d("debug", Class + " " + Purpose + " " + MeetTime + " " + Location + " " + Size);
@@ -306,7 +307,10 @@ class socketGrabCallableProfile implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE user FROM User user WHERE user.idNo = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE user " +
+                    "FROM User user " +
+                    "WHERE user.idNo = " + idNo + ";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");
@@ -357,12 +361,10 @@ class socketGrabCallableProfile implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; " +
-                    "SELECT guest.idNo AS id, " +
-                    "(SELECT VALUE party FROM Party party " +
-                    "WHERE party.partyID = guest.partyID) AS party " +
-                    "FROM isGuest guest " +
-                    "WHERE guest.idNo = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE party " +
+                    "FROM Party party " +
+                    "WHERE " + idNo + " in party.guests;";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

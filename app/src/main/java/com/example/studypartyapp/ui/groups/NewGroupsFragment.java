@@ -35,7 +35,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class NewGroupsFragment extends Fragment {
 
-    private EditText Name;
     private EditText Class;
     private EditText Purpose;
     private EditText DateTime;
@@ -49,7 +48,6 @@ public class NewGroupsFragment extends Fragment {
         //saves account ID Number for use
         String idNo = ( getArguments().getString("idGroup") );
 
-        Name = root.findViewById(R.id.groupgroup_GroupName);
         Class = root.findViewById(R.id.groupgroup_Class);
         Purpose = root.findViewById(R.id.groupgroup_Purpose);
         DateTime = root.findViewById(R.id.groupgroup_DateTime);
@@ -59,14 +57,13 @@ public class NewGroupsFragment extends Fragment {
         NewGroupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String NAME = Name.getText().toString();
                 String CLSS = Class.getText().toString();
                 String PRPS = Purpose.getText().toString();
                 String DTTM = DateTime.getText().toString();
                 String LCTN = Location.getText().toString();
                 String PTYS = PartySize.getText().toString();
 
-                if ( CreateNew(NAME, CLSS, PRPS, DTTM, LCTN, PTYS, idNo) ){
+                if ( CreateNew(CLSS, PRPS, DTTM, LCTN, PTYS, idNo) ){
                     GroupsFragment oldGroup = new GroupsFragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("idGroup", idNo);
@@ -84,12 +81,11 @@ public class NewGroupsFragment extends Fragment {
         return root;
     }
 
-    private boolean CreateNew(String name, String classs, String purpose,
+    private boolean CreateNew(String classs, String purpose,
                                      String datetime, String location, String partysize, String idNo) {
         if (classs.length() <= 20 && classs.length() > 0
         && partysize.length() <= 20 && partysize.length() > 0
         && location.length() <= 25 && location.length() > 0
-        && name.length() <= 20 && name.length() > 0
         && datetime.length() <= 20 && datetime.length() > 0
         && purpose.length() <= 20 && purpose.length() > 0) {
             //Randomly creates and verifies partyID not taken
@@ -119,7 +115,6 @@ public class NewGroupsFragment extends Fragment {
 
     private boolean exists(String partyID) {
         //TODO check if partyID exists already (false = NOT exist, true = exists)
-        String msgToSend = "USE StudyParty; SELECT guests.partyID FROM isGuest guests WHERE guests.partyID = " + partyID + ";";
         ArrayList<String> existsRes = stringCallable(partyID, 0, "", "", "", "", "", "");
         if (existsRes.size() != 0)
             return true;
@@ -259,18 +254,15 @@ class socketGrabCallableNewGroup implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "partyid:" + partyid);
-            String data = "use StudyParty; INSERT INTO Party ([ " +
+            String data = "use StudyParty1; INSERT INTO Party ([ " +
                     "{\"partyID\": " + partyid +
                     ", \"class\": \"" + Class +
                     "\" , \"size\": " + Size +
                     " , \"purpose\": \"" + Purpose +
                     "\", \"location\": \"" + Location +
                     "\", \"meetTime\": " + meetTime +
-                    ", \"hostID\": " + hostId + " }"
-                    + " ]);" +
-                    "INSERT INTO isGuest ([ " +
-                    "{\"idNo\": " + hostId +
-                    ", \"partyID\": " + partyid + " }"
+                    ", \"hostID\": " + hostId +
+                    ", \"guests\": {{" + hostId + "}} }"
                     + " ]);";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
@@ -322,7 +314,10 @@ class socketGrabCallableNewGroup implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE party FROM Party party WHERE party.partyID = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE party " +
+                    "FROM Party party " +
+                    "WHERE party.partyID = " + idNo + ";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

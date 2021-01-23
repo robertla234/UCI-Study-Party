@@ -215,7 +215,9 @@ class socketGrabCallableReturn implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE user FROM User user WHERE user.idNo = " + idNo + " AND user.passWord = \"" + passWord + "\";";
+            String data = "use StudyParty1; SELECT VALUE user " +
+                    "FROM User user " +
+                    "WHERE user.idNo = " + idNo + " AND user.passWord = \"" + passWord + "\";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

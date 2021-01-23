@@ -134,6 +134,7 @@ public class GroupsFragment extends Fragment {
         //  "partyID": 123, "class": "Testing", "size": 3, "purpose": "Testing", "location": "Online", "meetTime": 23, "hostID": 8
         //Output Format:
         //  CLASS PURPOSE at TIME \n at LOCATION
+        nameInput = nameInput.substring(0, nameInput.indexOf(" \"guests\":"));
         String[] output = new String[2];
 
         String[] keyValuePairs = nameInput.split(",");

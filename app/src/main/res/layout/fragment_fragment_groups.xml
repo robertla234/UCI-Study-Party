@@ -15,27 +15,13 @@
         android:layout_centerHorizontal="true"/>
 
     <EditText
-        android:id="@+id/groupgroup_GroupName"
-        android:layout_width="match_parent"
-        android:layout_height="60sp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_marginTop="40sp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/groupgroup_title"
-
-        android:ems="10"
-        android:hint="Name"
-        android:inputType="text"/>
-
-    <EditText
         android:id="@+id/groupgroup_Class"
         android:layout_width="match_parent"
         android:layout_height="60sp"
         android:layout_marginLeft="10sp"
         android:layout_marginRight="10sp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/groupgroup_GroupName"
+        android:layout_below="@id/groupgroup_title"
 
         android:ems="10"
         android:hint="Class"

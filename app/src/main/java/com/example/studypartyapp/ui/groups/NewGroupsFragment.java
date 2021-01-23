@@ -35,7 +35,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class NewGroupsFragment extends Fragment {
 
-    private EditText Name;
     private EditText Class;
     private EditText Purpose;
     private EditText DateTime;
@@ -49,7 +48,6 @@ public class NewGroupsFragment extends Fragment {
         //saves account ID Number for use
         String idNo = ( getArguments().getString("idGroup") );
 
-        Name = root.findViewById(R.id.groupgroup_GroupName);
         Class = root.findViewById(R.id.groupgroup_Class);
         Purpose = root.findViewById(R.id.groupgroup_Purpose);
         DateTime = root.findViewById(R.id.groupgroup_DateTime);
@@ -59,14 +57,13 @@ public class NewGroupsFragment extends Fragment {
         NewGroupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String NAME = Name.getText().toString();
                 String CLSS = Class.getText().toString();
                 String PRPS = Purpose.getText().toString();
                 String DTTM = DateTime.getText().toString();
                 String LCTN = Location.getText().toString();
                 String PTYS = PartySize.getText().toString();
 
-                if ( CreateNew(NAME, CLSS, PRPS, DTTM, LCTN, PTYS, idNo) ){
+                if ( CreateNew(CLSS, PRPS, DTTM, LCTN, PTYS, idNo) ){
                     GroupsFragment oldGroup = new GroupsFragment();
                     Bundle bundle = new Bundle();
                     bundle.putString("idGroup", idNo);
@@ -84,12 +81,11 @@ public class NewGroupsFragment extends Fragment {
         return root;
     }
 
-    private boolean CreateNew(String name, String classs, String purpose,
+    private boolean CreateNew(String classs, String purpose,
                                      String datetime, String location, String partysize, String idNo) {
         if (classs.length() <= 20 && classs.length() > 0
         && partysize.length() <= 20 && partysize.length() > 0
         && location.length() <= 25 && location.length() > 0
-        && name.length() <= 20 && name.length() > 0
         && datetime.length() <= 20 && datetime.length() > 0
         && purpose.length() <= 20 && purpose.length() > 0) {
             //Randomly creates and verifies partyID not taken
@@ -98,14 +94,15 @@ public class NewGroupsFragment extends Fragment {
             do {
                 int random = new Random().nextInt((10000 - 2) + 1) + 2;
                 partyID = Integer.toString(random);
-            } while (exists(partyID));
+            } while (idExists(partyID));
 
             //TODO randomly create and verify partyID not taken
+            boolean classExi = classExists(classs);
             
             Log.d("debug", "In NewGroupsFragment: in CreateNew after exists call");
             Log.d("debug", "idNo: " + idNo);
-            ArrayList<String> tray = stringCallable(partyID, 1, classs, partysize, purpose,
-                    location, datetime, idNo);
+            ArrayList<String> tray = stringCallable(partyID, 2, classs, partysize, purpose,
+                    location, datetime, idNo, classExi);
             if (tray == null) {
                 Log.d("debug", "In NewGroupsFragment: in CreateNew - tray == null");
                 return false;
@@ -117,10 +114,18 @@ public class NewGroupsFragment extends Fragment {
         }
     }
 
-    private boolean exists(String partyID) {
-        //TODO check if partyID exists already (false = NOT exist, true = exists)
-        String msgToSend = "USE StudyParty; SELECT guests.partyID FROM isGuest guests WHERE guests.partyID = " + partyID + ";";
-        ArrayList<String> existsRes = stringCallable(partyID, 0, "", "", "", "", "", "");
+    private boolean idExists(String partyID) {
+        //checks if partyID exists already (false = NOT exist, true = exists)
+        ArrayList<String> existsRes = stringCallable(partyID, 0, "", "", "", "", "", "", true);
+        if (existsRes.size() != 0)
+            return true;
+
+        return false;
+    }
+
+    private boolean classExists(String Class) {
+        //checks if class exists already (false = NOT exist, true = exists)
+        ArrayList<String> existsRes = stringCallable("", 1, Class, "", "", "", "", "", true);
         if (existsRes.size() != 0)
             return true;
 
@@ -128,13 +133,13 @@ public class NewGroupsFragment extends Fragment {
     }
 
     private ArrayList<String> stringCallable(String idNo, int pathID, String Class, String size, String purpose,
-                                             String location, String meetTime, String hostID){
+                                             String location, String meetTime, String hostID, boolean ClassExists){
         //setup for Socket retrieval
         ArrayList<String> endinG = new ArrayList<String>();
 
         ThreadPoolExecutor executor= (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
         List<Future<String>> retList = new ArrayList<>();
-        socketGrabCallableNewGroup trying = new socketGrabCallableNewGroup(idNo, pathID, Class, size, purpose, location, meetTime, hostID);
+        socketGrabCallableNewGroup trying = new socketGrabCallableNewGroup(idNo, pathID, Class, size, purpose, location, meetTime, hostID, ClassExists);
         Future<String> reting = executor.submit(trying);
         retList.add(reting);
 
@@ -154,7 +159,7 @@ public class NewGroupsFragment extends Fragment {
     }
 
     private ArrayList<String> asterixDBReturn(String input, int pathID){
-        if (pathID == 1){
+        if (pathID == 2){
             //Takes input from AsterixDB and parses it
             //Itemizes parts into ArrayList
             ArrayList<String> results = new ArrayList<String>();
@@ -215,7 +220,7 @@ public class NewGroupsFragment extends Fragment {
 }
 
 class socketGrabCallableNewGroup implements Callable<String> {
-    private String retString;
+    private String partyID;
     private String Class;
     private String Size;
     private String Purpose;
@@ -223,12 +228,14 @@ class socketGrabCallableNewGroup implements Callable<String> {
     private String meetTime;
     private String hostId;
 
+    private boolean classExists;
     private int pathId;
 
     public socketGrabCallableNewGroup(String partyID, int pathID, String Class, String size, String purpose,
-                                      String location, String meetTime, String hostID){
-        this.retString = partyID;
+                                      String location, String meetTime, String hostID, boolean classExists){
+        this.partyID = partyID;
         this.pathId = pathID;
+        this.classExists = classExists;
 
         this.Class = Class;
         this.Size = size;
@@ -241,14 +248,71 @@ class socketGrabCallableNewGroup implements Callable<String> {
     @Override
     public String call() throws Exception {
         if (pathId == 0)
-            return idCheckString(retString);
+            return idCheckString(partyID);
         else if (pathId == 1)
-            return startString(retString, Class, Size, Purpose, Location, meetTime, hostId);
-        return startString(retString, Class, Size, Purpose, Location, meetTime, hostId);
+            return classCheck(Class);
+        else if (pathId == 2){
+            return startString(partyID, Class, Size, Purpose, Location, meetTime, hostId, classExists);}
+        return startString(partyID, Class, Size, Purpose, Location, meetTime, hostId, classExists);
     }
 
+    private String classCheck(String Class) throws InterruptedException {
+        Log.d("debug", "In NewGroupsFragment: in classCheck Thread run");
+        Socket s;
+        DataOutputStream dos;
+        DataInputStream dis;
+        BufferedReader input;
+        String Endresult = null;
+
+        try {
+            //TODO 10.0.2.2 is apparently PC localhost port
+            Log.d("debug", "class:" + Class);
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE c " +
+                    "FROM Class c " +
+                    "WHERE c.class = \"" + Class + "\";";
+
+            String params = "statement=" + URLEncoder.encode(data, "UTF-8")
+                    + "&pretty=" + URLEncoder.encode("False", "UTF-8");
+
+            String result = new String();
+
+            URL url = new URL("http://10.0.2.2:19002/query/service");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            con.setDoOutput(true);
+
+            PrintWriter out = new PrintWriter(con.getOutputStream());
+            out.println(params);
+            out.close();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    con.getInputStream(), "UTF-8"));
+
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) {
+                result = result.concat(inputLine);
+            }
+            //Log.d("debug", result);
+            in.close();
+
+            Endresult = result;
+            Log.d("debug", "In NewGroupsFragment: in socketGrabCallableNewGroup classCheck");
+            Log.d("debug", "socketGrabCallableNewGroup: " + Endresult);
+
+        } catch (IOException e) {
+            Log.d("debug", "In NewGroupsFragment: in classCheck IOException");
+            e.printStackTrace();
+        } catch (Exception e) {
+            Log.d("debug", "In NewGroupsFragment: in classCheck Exception");
+        }
+        return Endresult;
+    }
+
+
     private String startString(String partyid, String Class, String Size, String Purpose,
-                               String Location, String meetTime, String hostId) throws InterruptedException {
+                               String Location, String meetTime, String hostId, boolean classExists) throws InterruptedException {
         Log.d("debug", "In NewGroupsFragment: in startString Thread run");
         Socket s;
         DataOutputStream dos;
@@ -259,19 +323,32 @@ class socketGrabCallableNewGroup implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "partyid:" + partyid);
-            String data = "use StudyParty; INSERT INTO Party ([ " +
+            String data = "use StudyParty1; INSERT INTO Party ([ " +
                     "{\"partyID\": " + partyid +
                     ", \"class\": \"" + Class +
                     "\" , \"size\": " + Size +
                     " , \"purpose\": \"" + Purpose +
                     "\", \"location\": \"" + Location +
                     "\", \"meetTime\": " + meetTime +
-                    ", \"hostID\": " + hostId + " }"
-                    + " ]);" +
-                    "INSERT INTO isGuest ([ " +
-                    "{\"idNo\": " + hostId +
-                    ", \"partyID\": " + partyid + " }"
+                    ", \"hostID\": " + hostId +
+                    ", \"guests\": {{" + hostId + "}} }"
                     + " ]);";
+            if (!classExists){
+                data += " INSERT INTO Class ([ " +
+                    "{\"class\": \"" + Class + "\", \"partyID\": {{" + partyid + "}} }" +
+                    " ]);";
+            }
+            else if (classExists) {
+                data += " UPSERT INTO Class ([ " +
+                        "{\"class\": \"" + Class + "\", " +
+                        "\"partyID\": ARRAY_APPEND(" +
+                        "(SELECT VALUE c.partyID FROM " +
+                        "Class c WHERE c.class = \"" + Class + "\")[0]," + partyid +
+                        ")}" +
+                        " ]);";
+            }
+
+            Log.d("test", data);
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");
@@ -322,7 +399,10 @@ class socketGrabCallableNewGroup implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE party FROM Party party WHERE party.partyID = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE party " +
+                    "FROM Party party " +
+                    "WHERE party.partyID = " + idNo + ";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

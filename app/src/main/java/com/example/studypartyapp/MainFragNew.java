@@ -40,6 +40,7 @@ public class MainFragNew extends Fragment {
     private EditText FirstNameEdTxt;
     private EditText LastNameEdTxt;
     private EditText MajorEdTxt;
+    private EditText EmailEdTxt;
 
     private Button NewBackBtn;
 
@@ -62,6 +63,7 @@ public class MainFragNew extends Fragment {
         FirstNameEdTxt = root.findViewById(R.id.new_user_FirstName);
         LastNameEdTxt = root.findViewById(R.id.new_user_LastName);
         MajorEdTxt = root.findViewById(R.id.new_user_Major);
+        EmailEdTxt = root.findViewById(R.id.new_user_Email);
         NewCreateBtn = root.findViewById(R.id.new_user_CreateNew);
         NewCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,11 +73,12 @@ public class MainFragNew extends Fragment {
                 String FNAM = FirstNameEdTxt.getText().toString();
                 String LNAM = LastNameEdTxt.getText().toString();
                 String MAJR = MajorEdTxt.getText().toString();
+                String EMIL = EmailEdTxt.getText().toString();
 
                 //Check input paramaters
-                if (ParamNewUser(IDNO, PASS, FNAM, LNAM, MAJR)) {
+                if (ParamNewUser(IDNO, PASS, FNAM, LNAM, MAJR, EMIL)) {
                     //Send New User Info to DB
-                    boolean isSent = SendNewUser(IDNO, PASS, FNAM, LNAM, MAJR);
+                    boolean isSent = SendNewUser(IDNO, PASS, FNAM, LNAM, MAJR, EMIL);
                     //Confirm DATA SENT and Continue to Rest of App
                     if (isSent) {
                         Log.d("debug", "In MainFragNew: before Intent/StartActivity");
@@ -101,7 +104,7 @@ public class MainFragNew extends Fragment {
     }
 
     private boolean ParamNewUser(String idNo, String password,
-                                       String firstName, String lastName, String major){
+                                       String firstName, String lastName, String major, String email){
         //TODO check input parameters in DB
         if (idNo.length() == 8 &&
         firstName.length() <= 20 && firstName.length() > 0 &&
@@ -115,22 +118,22 @@ public class MainFragNew extends Fragment {
     }
 
     private boolean SendNewUser(String idNo, String password,
-                                      String firstName, String lastName, String major){
+                                      String firstName, String lastName, String major, String email){
         //calls StringCallable to check and create new acc if none exist w ID
-        ArrayList<String> tray = stringCallable(idNo, password, firstName, lastName, major);
+        ArrayList<String> tray = stringCallable(idNo, password, firstName, lastName, major, email);
         if (tray == null)
             return false;
 
         return true;
     }
 
-    private ArrayList<String> stringCallable(String idNo, String password, String firstName, String lastName, String major){
+    private ArrayList<String> stringCallable(String idNo, String password, String firstName, String lastName, String major, String email){
         //setup for Socket retrieval
-        ArrayList<String> endinG = new ArrayList<String>();
+        ArrayList<String> endinG = new ArrayList<>();
 
         ThreadPoolExecutor executor= (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
         List<Future<String>> retList = new ArrayList<>();
-        socketGrabCallableNew trying = new socketGrabCallableNew(idNo, password, firstName, lastName, major);
+        socketGrabCallableNew trying = new socketGrabCallableNew(idNo, password, firstName, lastName, major, email);
         Future<String> reting = executor.submit(trying);
         retList.add(reting);
 
@@ -179,21 +182,23 @@ class socketGrabCallableNew implements Callable<String> {
     private String firstName;
     private String lastName;
     private String major;
+    private String email;
 
-    public socketGrabCallableNew(String idNo, String password, String firstName, String lastName, String major){
+    public socketGrabCallableNew(String idNo, String password, String firstName, String lastName, String major, String email){
         this.idNo = idNo;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.major = major;
+        this.email = email;
     }
 
     @Override
     public String call() throws Exception {
-        return startString(idNo, password, firstName, lastName, major);
+        return startString(idNo, password, firstName, lastName, major, email);
     }
 
-    private String startString(String idNo, String password, String firstName, String lastName, String major) throws InterruptedException {
+    private String startString(String idNo, String password, String firstName, String lastName, String major, String email) throws InterruptedException {
         Log.d("debug", "In MainFragNew: in startString Thread run");
         Socket s;
         DataOutputStream dos;
@@ -206,16 +211,7 @@ class socketGrabCallableNew implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; INSERT INTO User ([ " +
-                    "{\"idNo\": " + idNo +
-                    ", \"passWord\": \"" + password +
-                    "\" , \"firstName\": \"" + firstName +
-                    "\" , \"lastName\": \"" + lastName +
-                    "\", \"major\": \"" + major + "\" }"
-                    + " ]);";
-
-            /*
-            String data = "use StudyParty; INSERT INTO User ([ " +
+            String data = "use StudyParty1; INSERT INTO User ([ " +
                     "{\"idNo\": " + idNo +
                     ", \"passWord\": \"" + password +
                     "\" ,\"email\": \"" + email +
@@ -223,7 +219,7 @@ class socketGrabCallableNew implements Callable<String> {
                     "\" , \"lastName\": \"" + lastName +
                     "\", \"major\": \"" + major + "\" }"
                     + " ]);";
-             */
+
 
             Log.d("debug", "sending:" + data);
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
@@ -277,7 +273,10 @@ class socketGrabCallableNew implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE user FROM User user WHERE user.idNo = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE user " +
+                    "FROM User user " +
+                    "WHERE user.idNo = " + idNo + ";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

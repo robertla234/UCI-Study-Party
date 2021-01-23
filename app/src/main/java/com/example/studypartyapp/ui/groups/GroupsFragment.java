@@ -134,6 +134,7 @@ public class GroupsFragment extends Fragment {
         //  "partyID": 123, "class": "Testing", "size": 3, "purpose": "Testing", "location": "Online", "meetTime": 23, "hostID": 8
         //Output Format:
         //  CLASS PURPOSE at TIME \n at LOCATION
+        nameInput = nameInput.substring(0, nameInput.indexOf(" \"guests\":"));
         String[] output = new String[2];
 
         String[] keyValuePairs = nameInput.split(",");
@@ -198,7 +199,8 @@ public class GroupsFragment extends Fragment {
         Log.d("debug", "In GroupsFragment: in asterixDBReturn");
 
         int ParanIndex1 = input.indexOf("[");
-        int ParanIndex2 = input.indexOf("]");
+        int PlansIndex = input.indexOf("\"plans\"");
+        int ParanIndex2 = input.lastIndexOf("]", PlansIndex);
 
         //resultOnly removes all other parts of DB String
         //  and leaves the results only
@@ -257,7 +259,10 @@ class socketGrabCallableGroup implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; SELECT VALUE party FROM Party party WHERE party.hostID = " + idNo + ";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE party " +
+                    "FROM Party party " +
+                    "WHERE party.hostID = " + idNo + ";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

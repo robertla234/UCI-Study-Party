@@ -101,8 +101,11 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
 
                     //calls for list of Class from DB
                     ArrayList<String> classArray = stringCallable(idNo, Class, 1);
-                    classArray = processingClass(classArray, idNo,1);
-                    //classArray.removeAll(classArray);
+                    if (classArray.isEmpty())
+                        classArray.add("No new groups for " + Class);
+                    else {
+                        classArray = processingClass(classArray, idNo, 1);
+                    }
 
                     SearchList.removeAllViews();
                     for (int i = 0; i < classArray.size(); i++){
@@ -115,7 +118,9 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                         params.setMargins(0, 10, 0, 10);
 
                         //Set Text and Content Settings for Button
-                        String processName = classArray.get(i);
+                        String processInput = classArray.get(i);
+                        String partyID = processInput.substring(0, processInput.indexOf("?"));
+                        String processName = processInput.substring(processInput.indexOf("?") + 1);
 
                         classBtn.setText(processName); // replace w/ setString
                         classBtn.setId(i); //Button with Unique ID
@@ -128,7 +133,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                             public void onClick(View view){
                                 //Group Info Requests
                                 //TODO Send Join Command
-                                Toast.makeText(getActivity().getBaseContext(), ("TEST12"), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getBaseContext(), ("partyID:" + partyID), Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -159,6 +164,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
     }
 
     private String processingName(String nameInput, String idNo, int pathID){
+        Log.d("debug", "In Search Fragment: in processingName -> path " + Integer.toString(pathID));
         if (pathID == 0) {
             //changes input DB string to readable details of Study Party
             //Input Format: (Sample)
@@ -166,7 +172,8 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             //{ "class": "Testingology 110", "party": [ 8, 9, 7 ] }
             //Output Format:
             //
-            return nameInput.substring(12, nameInput.indexOf(",") - 1);
+            Log.d("procName", nameInput);
+            return nameInput;
         }
         else if (pathID == 1){
             //Input Format: (Sample)
@@ -176,22 +183,29 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             //{ "party": { "partyID": 1, "class": "Testingism", "size": 6, "purpose": "Final", "location": "Online", "meetTime": 11, "hostID": 8 }
             //Output Format:
             //
-            nameInput = nameInput.substring(12, nameInput.length() - 2);
+            String nameInputGuest = nameInput.substring(nameInput.indexOf("\"guests\"") - 1, nameInput.length() - 2);
+            nameInput = nameInput.substring(2, nameInput.indexOf("\"guests\"") - 2);
+            Log.d("asterixdbret", "pathID 1:" + nameInput);
+            Log.d("asterixdbret", nameInputGuest);
 
             String[] keyValuePairs = nameInput.split(",");
+            //for (int jkl = 0; jkl < keyValuePairs.length; jkl++) { Log.d("asterixdbret", keyValuePairs[jkl]); }
             Map<String,String> map = new HashMap<>();
             for (String pair : keyValuePairs){
                 String[] entry = pair.split(":");
                 map.put(entry[0].trim(), entry[1].trim());
             }
+            String[] entry = nameInputGuest.split(":");
+            map.put(entry[0].trim(), entry[1].trim());
 
-            String guests = map.get("\"guest\"");
-            Log.d("debug", "guest: " + guests);
-            if (guests.equals("[  ]")){
+            String guests = map.get("\"guests\"");
+            Log.d("debug", "guests: " + guests);
+            if (guests.contains(idNo)){
                 Log.d("debug", "No guests. ALREADY IN GROUP");
-                //return "ALREADY IN THIS GROUP";
+                return "ALREADY IN THIS GROUP";
             }
 
+            String partyID = map.get("\"partyID\"");
             String Class = map.get("\"class\"");
             String Purpose = map.get("\"purpose\"");
             String MeetTime = map.get("\"meetTime\"");
@@ -205,19 +219,13 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                 Purpose = Purpose.substring(1, Purpose.length() - 1);
             if (Location.length() != 1)
                 Location = Location.substring(1, Location.length() - 1);
-            if (hostID.length() != 1)
-                hostID = hostID.substring(0, hostID.length() - 2);
 
             Log.d("debug", "host ID: " + hostID);
             Log.d("debug", Class + " " + Purpose + " " + MeetTime + " " + Location + " " + Size);
 
-            String placeHold = Class + " " + Purpose + " at " + MeetTime + ":00\n" +
+            String placeHold = partyID + "?" + Class + " " + Purpose + " at " + MeetTime + ":00\n" +
                     Location + "\n" +
                     "People in Party: " + Size;
-            if (hostID.equals(idNo)){
-                placeHold = "ALREADY IN THIS GROUP";
-                Log.d("debug", "------ PASSES PASSES PASSES PASSES PASSES PASSES ------");
-            }
             return placeHold;
         }
 
@@ -254,7 +262,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         String ending1 = "";
         try {
             String ending = reting.get();
-            Log.d("debug", "In ProfileFragment: in stringCallable");
+            Log.d("debug", "In SearchFragment: in stringCallable");
             ending1 = ending;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -272,7 +280,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         //Itemizes parts into ArrayList
         ArrayList<String> results = new ArrayList<String>();
 
-        Log.d("debug", "In ProfileFragment: in asterixDBReturn");
+        Log.d("debug", "In SearchFragment: in asterixDBReturn -> path " + Integer.toString(pathID));
 
         int ParanIndex1 = input.indexOf("[");
         int ParanIndex2 = input.indexOf("plans") - 4;
@@ -280,31 +288,44 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         //resultOnly removes all other parts of DB String
         //  and leaves the results only
         String resultOnly = input.substring(ParanIndex1 + 2, ParanIndex2 - 1);
+        Log.d("asterixdbret", "resultOnly:" + resultOnly);
 
-        //This section does the parsing of the { }
-        String whatsLeft = resultOnly;
-        int finwhatsLeft = whatsLeft.length() - 1;
-        int openParIndex = whatsLeft.indexOf("{");
-        int closeParIndex = whatsLeft.indexOf("}");
-        if (pathID == 1)
-            closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
-        String saveStr = "";
-        int iteration = 1;
-
-        while (openParIndex != -1 && closeParIndex != -1){
-            saveStr = whatsLeft.substring(openParIndex, closeParIndex + 1);
-
-            results.add(saveStr);
-            if (whatsLeft.indexOf("{", closeParIndex) != -1)
-                whatsLeft = whatsLeft.substring(whatsLeft.indexOf("{", closeParIndex));
-            else {
-                whatsLeft = "";
+        if (pathID == 0){
+            String whatsLeft = resultOnly.substring(0, resultOnly.length() - 1);
+            //Log.d("asterixdbret", "whatsLeft:" + whatsLeft);
+            String[] temp = whatsLeft.split(",");
+            for (int i = 0; i < temp.length; i++){
+                String addee = temp[i];
+                //Log.d("asterixdbret", "addee 1:" + addee);
+                int start = addee.indexOf("\"");
+                int end = addee.indexOf("\"", start + 1);
+                addee = addee.substring(start + 1, end);
+                //Log.d("asterixdbret", Integer.toString(start) + " " + Integer.toString(end));
+                results.add(addee);
             }
-            openParIndex = whatsLeft.indexOf("{");
-            closeParIndex = whatsLeft.indexOf("}");
-            if (pathID == 1)
-                closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
-            finwhatsLeft = whatsLeft.length() - 1;
+        }
+
+        else if (pathID == 1){
+            //This section does the parsing of the { }
+            String whatsLeft = resultOnly;
+            int openParIndex = whatsLeft.indexOf("{");
+            int closeParIndex = whatsLeft.indexOf("}");
+            //closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
+            String saveStr = "";
+
+            while (openParIndex != -1 && closeParIndex != -1){
+                saveStr = whatsLeft.substring(openParIndex, closeParIndex + 1);
+
+                results.add(saveStr);
+                if (whatsLeft.indexOf("{", closeParIndex) != -1)
+                    whatsLeft = whatsLeft.substring(whatsLeft.indexOf("{", closeParIndex));
+                else {
+                    whatsLeft = "";
+                }
+                openParIndex = whatsLeft.indexOf("{");
+                closeParIndex = whatsLeft.indexOf("}");
+                //closeParIndex = whatsLeft.indexOf("}", closeParIndex + 1);
+            }
         }
 
         for (int i = 0; i < results.size(); i++){
@@ -346,10 +367,8 @@ class socketGrabCallableSearch implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; " +
-                    "SELECT class.class AS class, " +
-                    "(SELECT VALUE party.partyID FROM Party party " +
-                    "WHERE party.class = class.class) AS party " +
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE class.class " +
                     "FROM Class class;";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
@@ -401,13 +420,17 @@ class socketGrabCallableSearch implements Callable<String> {
         try {
             //TODO 10.0.2.2 is apparently PC localhost port
             Log.d("debug", "idNo:" + idNo);
-            String data = "use StudyParty; " +
-                    "SELECT party AS party, " +
-                    "(SELECT VALUE guest FROM isGuest guest " +
-                    "WHERE guest.partyID = party.partyID " +
-                    "AND guest.idNo != " + idNo + ") AS guest " +
-                    "FROM Party party " +
-                    "WHERE party.class = \"" + Class + "\";";
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE p " +
+                    "FROM Party p " +
+                    "WHERE p.class = \"" + Class + "\" AND " + idNo + " NOT in p.guests;";
+
+            //TODO
+            //TODO
+            //TODO CHANGE back to idNo NOT in p.guests....changed for testing purposes
+            //TODO
+            //TODO
+
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

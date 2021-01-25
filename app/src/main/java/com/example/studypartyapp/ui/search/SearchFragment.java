@@ -99,45 +99,74 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                     String Class = processName;
                     ProfileTitle.setText("Join a Group");
 
+                    boolean classEmpty = false;
                     //calls for list of Class from DB
                     ArrayList<String> classArray = stringCallable(idNo, Class, 1);
-                    if (classArray.isEmpty())
+                    if (classArray.isEmpty()) {
                         classArray.add("No new groups for " + Class);
+                        classEmpty = true;
+                        Log.d("insider", "insder1");
+                    }
                     else {
                         classArray = processingClass(classArray, idNo, 1);
+                        Log.d("insider", "insder2");
                     }
 
                     SearchList.removeAllViews();
-                    for (int i = 0; i < classArray.size(); i++){
-                        //CreateNewButton
+                    if (classEmpty){
                         final Button classBtn = new Button(root.getContext());
-
-                        //Set Margins and Parameters between Buttons
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.setMargins(0, 10, 0, 10);
 
-                        //Set Text and Content Settings for Button
-                        String processInput = classArray.get(i);
-                        String partyID = processInput.substring(0, processInput.indexOf("?"));
-                        String processName = processInput.substring(processInput.indexOf("?") + 1);
-
-                        classBtn.setText(processName); // replace w/ setString
-                        classBtn.setId(i); //Button with Unique ID
+                        classBtn.setText(classArray.get(0)); // replace w/ setString
+                        classBtn.setId(0); //Button with Unique ID
                         classBtn.setBackgroundColor(Color.DKGRAY);
                         classBtn.setTextColor(Color.WHITE);
-
-                        //Control what Button does on Click
-                        classBtn.setOnClickListener(new View.OnClickListener(){
+                        classBtn.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View view){
-                                //Group Info Requests
-                                //TODO Send Join Command
-                                Toast.makeText(getActivity().getBaseContext(), ("partyID:" + partyID), Toast.LENGTH_SHORT).show();
-                            }
+                            public void onClick(View view) {}
                         });
-
                         SearchList.addView(classBtn, params);
+                    }
+                    else {
+                        for (int i = 0; i < classArray.size(); i++) {
+                            //CreateNewButton
+                            final Button classBtn = new Button(root.getContext());
+
+                            //Set Margins and Parameters between Buttons
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            params.setMargins(0, 10, 0, 10);
+
+                            //Set Text and Content Settings for Button
+                            String processInput = classArray.get(i);
+                            String partyID = processInput.substring(0, processInput.indexOf("?"));
+                            String processName = processInput.substring(processInput.indexOf("?") + 1);
+
+                            classBtn.setText(processName); // replace w/ setString
+                            classBtn.setId(i); //Button with Unique ID
+                            classBtn.setBackgroundColor(Color.DKGRAY);
+                            classBtn.setTextColor(Color.WHITE);
+
+                            classBtn.setTag(0);
+                            //Control what Button does on Click
+                            classBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    //Join Command
+                                    final int status = (Integer) view.getTag();
+                                    if(status == 0) {
+                                        ArrayList<String> joinArray = stringCallable(idNo, partyID, 2);
+                                        Toast.makeText(getActivity().getBaseContext(), ("partyID:" + partyID), Toast.LENGTH_SHORT).show();
+                                        view.setTag(1);
+                                        classBtn.setText("GROUP JOINED");
+                                    }
+                                }
+                            });
+
+                            SearchList.addView(classBtn, params);
+                        }
                     }
 
                     final Button subscribeBtn = new Button(root.getContext());
@@ -276,6 +305,23 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
     }
 
     private ArrayList<String> asterixDBReturn(String input, int pathID){
+        if (pathID == 2){
+            //Takes input from AsterixDB and parses it
+            //Itemizes parts into ArrayList
+            ArrayList<String> results = new ArrayList<String>();
+
+            Log.d("debug", "In SearchFragment: in asterixDBReturn");
+            Log.d("debug", "In:" + input);
+            if (input == null){
+                Log.d("debug", "Returning null...");
+                return null;
+            }
+            int ParanIndex1 = input.indexOf("\"status\"");
+            results.add(input.substring(ParanIndex1, ParanIndex1 + 20));
+
+            return results;
+        }
+
         //Takes input from AsterixDB and parses it
         //Itemizes parts into ArrayList
         ArrayList<String> results = new ArrayList<String>();
@@ -353,6 +399,8 @@ class socketGrabCallableSearch implements Callable<String> {
             return startString(retString);
         else if (pathId == 1)
             return groupString(retString, use2);
+        else if(pathId == 2)
+            return joinString(retString, use2);
         return startString(retString);
     }
 
@@ -425,12 +473,71 @@ class socketGrabCallableSearch implements Callable<String> {
                     "FROM Party p " +
                     "WHERE p.class = \"" + Class + "\" AND " + idNo + " NOT in p.guests;";
 
-            //TODO
-            //TODO
-            //TODO CHANGE back to idNo NOT in p.guests....changed for testing purposes
-            //TODO
-            //TODO
 
+            String params = "statement=" + URLEncoder.encode(data, "UTF-8")
+                    + "&pretty=" + URLEncoder.encode("False", "UTF-8");
+
+            String result = new String();
+
+            URL url = new URL("http://10.0.2.2:19002/query/service");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            con.setDoOutput(true);
+
+            PrintWriter out = new PrintWriter(con.getOutputStream());
+            out.println(params);
+            out.close();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    con.getInputStream(), "UTF-8"));
+
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) {
+                result = result.concat(inputLine);
+            }
+            Log.d("debug", result);
+            in.close();
+
+            Endresult = result;
+            Log.d("debug", "In SearchFragment: in socketGrabCallableSearch groupString");
+            Log.d("debug", "socketGrabCallableSearch: " + Endresult);
+
+        } catch (IOException e) {
+            Log.d("debug", "In SearchFragment: in groupString IOException");
+            e.printStackTrace();
+        } catch (Exception e) {
+            Log.d("debug", "In SearchFragment: in groupString Exception");
+        }
+        return Endresult;
+    }
+
+    private String joinString(String idNo, String partyID) throws InterruptedException {
+        Log.d("debug", "In SearchFragment: in groupString Thread run");
+        Socket s;
+        DataOutputStream dos;
+        DataInputStream dis;
+        BufferedReader input;
+        String Endresult = null;
+
+        try {
+            //TODO 10.0.2.2 is apparently PC localhost port
+            Log.d("debug", "idNo:" + idNo);
+            Log.d("debug", "partyID:" + partyID);
+            String data = "use StudyParty1; " +
+                    "UPSERT INTO Party ([{ " +
+                    "\"partyID\": " + partyID + ", " +
+                    "\"class\": (SELECT VALUE c.class FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"size\": (SELECT VALUE c.size FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"purpose\": (SELECT VALUE c.purpose FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"location\": (SELECT VALUE c.location FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"meetTime\": (SELECT VALUE c.meetTime FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"hostID\": (SELECT VALUE c.hostID FROM Party c WHERE c.partyID = " + partyID + ")[0], " +
+                    "\"guests\": ARRAY_APPEND(" +
+                    "(SELECT VALUE c.guests FROM Party c WHERE c.partyID = " + partyID + ")[0], " + idNo + ") " +
+                    "}]);";
+
+            //TODO Redo data command
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
                     + "&pretty=" + URLEncoder.encode("False", "UTF-8");

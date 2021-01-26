@@ -103,7 +103,7 @@
         android:layout_below="@id/new_user_Major"
 
         android:ems="10"
-        android:hint="ID Number"
+        android:hint="UCI ID Number"
         android:inputType="text|number"/>
 
     <EditText

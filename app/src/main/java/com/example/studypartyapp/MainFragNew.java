@@ -3,6 +3,7 @@ package com.example.studypartyapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,13 +58,29 @@ public class MainFragNew extends Fragment {
             }
         });
         */
+        View.OnKeyListener EdTxtKeyList = new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event != null) && event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                    NewCreateBtn.performClick();
+                    return true;
+                }
+                return false;
+            }
+        };
 
         IDNumberEdTxt = root.findViewById(R.id.new_user_IDNum);
+        //IDNumberEdTxt.setOnKeyListener(EdTxtKeyList);
         PasswordEdTxt = root.findViewById(R.id.new_user_Password);
+        //PasswordEdTxt.setOnKeyListener(EdTxtKeyList);
         FirstNameEdTxt = root.findViewById(R.id.new_user_FirstName);
+        //FirstNameEdTxt.setOnKeyListener(EdTxtKeyList);
         LastNameEdTxt = root.findViewById(R.id.new_user_LastName);
+        //LastNameEdTxt.setOnKeyListener(EdTxtKeyList);
         MajorEdTxt = root.findViewById(R.id.new_user_Major);
+        //MajorEdTxt.setOnKeyListener(EdTxtKeyList);
         EmailEdTxt = root.findViewById(R.id.new_user_Email);
+        //EmailEdTxt.setOnKeyListener(EdTxtKeyList);
         NewCreateBtn = root.findViewById(R.id.new_user_CreateNew);
         NewCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,12 +107,10 @@ public class MainFragNew extends Fragment {
                     }
                     else{
                         Toast.makeText(getActivity().getBaseContext(), "ID Number has already been registered. ERROR CODE: MFN_SNU", Toast.LENGTH_SHORT).show();
-                        return;
                     }
                 }
                 else{
                     Toast.makeText(getActivity().getBaseContext(), "Login doesn't meet length requirements. Please try again.", Toast.LENGTH_SHORT).show();
-                    return;
                 }
             }
         });

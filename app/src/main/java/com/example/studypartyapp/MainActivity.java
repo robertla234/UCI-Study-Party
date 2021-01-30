@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button ReturnBtn;
     private Button NewUserBtn;
-    private boolean passedUserCheck = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Log.d("debug", "In MainActivity: onCreate setup");
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         ReturnBtn = findViewById(R.id.mainReturnUser);
         NewUserBtn = findViewById(R.id.mainNewUser);
 
@@ -60,32 +58,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ft.commit();
     }
 
-    //Handles Bottom Navigation and Switching
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment selectedFragment = null;
-
-                    switch(item.getItemId()) { //referenced in bottom_nav_menu.xml
-                        case R.id.bnmnavigation_groups:
-                            selectedFragment = new GroupsFragment();
-                            break;
-                        case R.id.bnmnavigation_profile:
-                            selectedFragment = new ProfileFragment();
-                            break;
-                        case R.id.bnmnavigation_search:
-                            selectedFragment = new SearchFragment();
-                            break;
-                    }
-
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            selectedFragment).commit();
-
-                    return true;
-                }
-            };
-
     //Used for NEW/RETURNING USER buttons
     @Override
     public void onClick(View v) {
@@ -105,5 +77,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ReturnBtn.setVisibility(View.GONE);
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+        Log.d("debug", "Back Pressed");
+        setContentView(R.layout.activity_main);
+
+        ReturnBtn = findViewById(R.id.mainReturnUser);
+        NewUserBtn = findViewById(R.id.mainNewUser);
+
+        NewUserBtn.setOnClickListener(this);
+        ReturnBtn.setOnClickListener(this);
     }
 }

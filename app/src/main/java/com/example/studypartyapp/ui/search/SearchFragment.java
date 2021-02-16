@@ -273,6 +273,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         Log.d("debug", "In SearchFragment: in processingClass -> path " + Integer.toString(pathID));
         ArrayList<String> output = new ArrayList<>();
 
+        if (classArray.isEmpty()) return output;
         output.add(processingName(classArray.get(0), idNo, pathID));
         for (int i = 1; i < classArray.size(); i++){
             String fill = processingName(classArray.get(i), idNo, pathID);
@@ -347,6 +348,7 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
         if (pathID == 0){
             String whatsLeft = resultOnly.substring(0, resultOnly.length() - 1);
             //Log.d("asterixdbret", "whatsLeft:" + whatsLeft);
+            if(whatsLeft.equals("")) return results;
             String[] temp = whatsLeft.split(",");
             for (int i = 0; i < temp.length; i++){
                 String addee = temp[i];

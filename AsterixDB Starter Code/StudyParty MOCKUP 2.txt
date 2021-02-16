@@ -1,0 +1,60 @@
+use StudyParty1;
+INSERT INTO User
+([
+{"idNo": 11223344,
+"passWord": "aaa",
+"email": "f11223344@false.com",
+"firstName": "Sandy",
+"lastName": "Smith",
+"major": "Testology"},
+{"idNo": 44332211,
+"passWord": "aaa",
+"email": "f44332211@fake.com",
+"firstName": "March",
+"lastName": "Schneider",
+"major": "Testingism"},
+{"idNo": 12121212,
+"passWord": "aaa",
+"email": "f12121212@false.com",
+"firstName": "Shawn",
+"lastName": "Elricson",
+"major": "Testism"}   
+]);
+
+INSERT INTO Party
+([
+{"partyID": 1,
+"class": "Testingism 1",
+"size": 4,
+"purpose": "Final",
+"location": "Online",
+"meetTime": 4,
+"hostID": 11223344,
+"guests": {{11223344, 44332211}} },
+{"partyID": 2,
+"class": "Testology 2",
+"size": 7,
+"purpose": "Quiz",
+"location": "Online",
+"meetTime": 8,
+"hostID": 44332211,
+"guests": {{44332211, 12121212}} },
+{"partyID": 3,
+"class": "Testism 4",
+"size": 4,
+"purpose": "Test",
+"location": "Online",
+"meetTime": 4,
+"hostID": 12121212,
+"guests": {{12121212, 11223344, 44332211}} }
+]);
+
+INSERT INTO Class
+([
+{"class": "Testingism 1",
+"partyID": {{1}} },
+{"class": "Testology 2",
+"partyID": {{2}} },
+{"class": "Testism 4",
+"partyID": {{3}} }
+]);

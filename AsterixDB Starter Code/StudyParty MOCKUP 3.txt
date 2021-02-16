@@ -1,0 +1,50 @@
+use StudyParty1;
+INSERT INTO User
+([
+{"idNo": ###,
+"passWord": "aaaa",
+"email: "aaa@aaa.com",
+"firstName": "aaaa",
+"lastName": "aaaa",
+"major": "aaa"} 
+]);
+
+----------
+
+use StudyParty1;
+INSERT INTO Party
+([
+{"partyID": ###-1,
+"class": "aaaa",
+"size": ###,
+"purpose": "aaaa",
+"location": "aaaa",
+"meetTime": ####,
+"hostID": ####}
+]);
+INSERT INTO Class
+([
+{"class": "aaaa",
+"partyID: {{###-1}}}
+]);
+
+OR
+
+UPSERT INTO Class ([
+{"class": "",
+"partyID": ARRAY_APPEND(
+(SELECT VALUE c.partyID FROM
+Class c WHERE c.class = "aaaa")[0], ###-1)}
+]);
+
+----------
+
+use StudyParty1;
+DELETE FROM User user
+WHERE user.idNo = ###;
+
+----------
+
+use StudyParty1;
+DROP Dataset Class if exists;
+DROP Type ClassType if exists;

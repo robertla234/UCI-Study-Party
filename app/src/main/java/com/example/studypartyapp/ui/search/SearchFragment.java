@@ -176,15 +176,24 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
                     subscribeBtn.setTextColor(Color.WHITE);
 
                     subscribeBtn.setTag(3);
+                    ArrayList<String> subcheckArray = stringCallable(idNo, Class, 3);
+                    if (!subcheckArray.isEmpty()) {
+                        if (!(subcheckArray.get(0)).equals(" ")){
+                            Log.d("btn", "HERE");
+                            subscribeBtn.setTag(4);
+                            subscribeBtn.setText("SUBSCRIBED!");
+                        }
+                    }
+
                     subscribeBtn.setOnClickListener(new View.OnClickListener(){
                        @Override
                        public void onClick(View view){
                            //TODO Send Subscribe Request
                            final int subscribeStatus = (Integer) view.getTag();
-                           if(subscribeStatus == 3) {
-                               ArrayList<String> subscribeArray = stringCallable(idNo, Class, 3);
+                           if(subscribeStatus == 3){ // && subCheck == false) {
+                               ArrayList<String> subscribeArray = stringCallable(idNo, Class, 4);
                                Toast.makeText(getActivity().getBaseContext(), ("Subscribed to " + Class + "."), Toast.LENGTH_SHORT).show();
-                               Toast.makeText(getActivity().getBaseContext(), Integer.toString(subscribeStatus), Toast.LENGTH_SHORT).show();
+                               //Toast.makeText(getActivity().getBaseContext(), Integer.toString(subscribeStatus), Toast.LENGTH_SHORT).show();
                                view.setTag(4);
                                subscribeBtn.setText("SUBSCRIBED!");
                            }
@@ -384,6 +393,10 @@ public class SearchFragment extends Fragment { //implements SearchView.OnQueryTe
             }
         }
 
+        else if (pathID == 3){
+            results.add(resultOnly);
+        }
+
         for (int i = 0; i < results.size(); i++){
             Log.d("debug", "in:" + results.get(i));
         }
@@ -412,6 +425,8 @@ class socketGrabCallableSearch implements Callable<String> {
         else if(pathId == 2)
             return joinString(retString, use2);
         else if(pathId == 3)
+            return subcheckString(retString, use2);
+        else if(pathId == 4)
             return subscribeString(retString, use2);
         return startString(retString);
     }
@@ -585,6 +600,60 @@ class socketGrabCallableSearch implements Callable<String> {
             e.printStackTrace();
         } catch (Exception e) {
             Log.d("debug", "In SearchFragment: in joinString Exception");
+        }
+        return Endresult;
+    }
+
+    private String subcheckString(String idNo, String Class) throws InterruptedException {
+        Log.d("debug", "In SearchFragment: in subscribeString Thread run");
+        Socket s;
+        DataOutputStream dos;
+        DataInputStream dis;
+        BufferedReader input;
+        String Endresult = null;
+
+        try {
+            //TODO 10.0.2.2 is apparently PC localhost port
+            Log.d("debug", "idNo:" + idNo);
+            Log.d("debug", "class:" + Class);
+            String data = "use StudyParty1; " +
+                    "SELECT VALUE m FROM newClassChannelSubscriptions as m " +
+                    "WHERE m.param1 = " + idNo + " AND m.param0 = \"" + Class + "\";";
+
+            String params = "statement=" + URLEncoder.encode(data, "UTF-8")
+                    + "&pretty=" + URLEncoder.encode("False", "UTF-8");
+
+            String result = new String();
+
+            URL url = new URL("http://10.0.2.2:19002/query/service");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            con.setDoOutput(true);
+
+            PrintWriter out = new PrintWriter(con.getOutputStream());
+            out.println(params);
+            out.close();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    con.getInputStream(), "UTF-8"));
+
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) {
+                result = result.concat(inputLine);
+            }
+            Log.d("debug", result);
+            in.close();
+
+            Endresult = result;
+            Log.d("debug", "In SearchFragment: in socketGrabCallableSearch subscribeString");
+            Log.d("debug", "socketGrabCallableSearch: " + Endresult);
+
+        } catch (IOException e) {
+            Log.d("debug", "In SearchFragment: in subscribeString IOException");
+            e.printStackTrace();
+        } catch (Exception e) {
+            Log.d("debug", "In SearchFragment: in subscribeString Exception");
         }
         return Endresult;
     }

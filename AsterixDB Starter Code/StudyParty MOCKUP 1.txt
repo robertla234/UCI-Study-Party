@@ -62,7 +62,6 @@ subscribe to newClassChannel("Testing", 123) on brokerC;
 use StudyParty1;
 SELECT VALUE m
 FROM newClassChannelSubscriptions as m
-where m.param1 = 123
-order by m;
+where m.param1 = ###;
 
 --------

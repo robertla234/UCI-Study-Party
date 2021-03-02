@@ -101,6 +101,7 @@ public class NewGroupsFragment extends Fragment {
             
             Log.d("debug", "In NewGroupsFragment: in CreateNew after exists call");
             Log.d("debug", "idNo: " + idNo);
+            Log.d("debug", "classExi: " + classExi);
             ArrayList<String> tray = stringCallable(partyID, 2, classs, partysize, purpose,
                     location, datetime, idNo, classExi);
             if (tray == null) {
@@ -184,10 +185,14 @@ public class NewGroupsFragment extends Fragment {
 
         int ParanIndex1 = input.indexOf("[");
         int ParanIndex2 = input.indexOf("]");
+        if (pathID == 1){
+            ParanIndex2 = input.lastIndexOf("]", input.indexOf("\"plans\""));
+        }
 
         //resultOnly removes all other parts of DB String
         //  and leaves the results only
         String resultOnly = input.substring(ParanIndex1 + 2, ParanIndex2 - 1);
+        Log.d("res", resultOnly);
 
         //This section does the parsing of the { }
         String whatsLeft = resultOnly;

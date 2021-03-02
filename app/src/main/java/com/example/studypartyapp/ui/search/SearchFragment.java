@@ -617,7 +617,7 @@ class socketGrabCallableSearch implements Callable<String> {
             Log.d("debug", "idNo:" + idNo);
             Log.d("debug", "class:" + Class);
             String data = "use StudyParty1; " +
-                    "SELECT VALUE m FROM newClassChannelSubscriptions as m " +
+                    "SELECT VALUE m FROM NewClassSubscriptions as m " +
                     "WHERE m.param1 = " + idNo + " AND m.param0 = \"" + Class + "\";";
 
             String params = "statement=" + URLEncoder.encode(data, "UTF-8")
@@ -671,7 +671,7 @@ class socketGrabCallableSearch implements Callable<String> {
             Log.d("debug", "idNo:" + idNo);
             Log.d("debug", "class:" + Class);
             String data = "use StudyParty1; " +
-                    "SUBSCRIBE to newClassChannel(\""+ Class +"\", " + idNo + ") on brokerC;";
+                    "SUBSCRIBE to NewClass(\""+ Class +"\", " + idNo + ") on brokerA;";
 
             //TODO Redo data command
 

@@ -30,38 +30,15 @@ partyID: {{int}}
 CREATE DATASET User(UserType)
     PRIMARY KEY idNo;
     
-CREATE DATASET Party(PartyType)
+CREATE ACTIVE DATASET Party(PartyType)
     PRIMARY KEY partyID;
 
 CREATE DATASET Class (ClassType)
-	PRIMARY KEY class;
+    PRIMARY KEY class;
 
-CREATE FUNCTION NewClass(class, userid) {
-(SELECT VALUE p
-FROM Party p
-WHERE contains (p.class, class))
+CREATE BROKER brokerA at "http://127.0.0.1:8081";
+CREATE CONTINUOUS push CHANNEL NewClass(class, idNo) PERIOD duration ("PT2S"){
+    SELECT VALUE p, 
+    FROM Party p
+    WHERE is_new(p) AND contains (p.class, class)
 };
-
-CREATE BROKER brokerC at "---";
-CREATE REPETITIVE CHANNEL newClassChannel using NewClass@2 period duration ("PT1S");
-
-------------------------
-------------------------
-???? 
-src/test/resources/metadata/queries/bad_cq/continuous_channel
-CREATE CONTINOUS CHANNEL newClassChannel newClassChannel(???) PERIOD duration ("PT1S")
-{SELECT FROM WHERE ??? };
-
---------
-
-use StudyParty1;
-subscribe to newClassChannel("Testing", 123) on brokerC;
-
---------
-
-use StudyParty1;
-SELECT VALUE m
-FROM newClassChannelSubscriptions as m
-where m.param1 = ###;
-
---------

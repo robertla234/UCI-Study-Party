@@ -48,3 +48,24 @@ WHERE user.idNo = ###;
 use StudyParty1;
 DROP Dataset Class if exists;
 DROP Type ClassType if exists;
+
+--------
+
+use StudyParty1;
+subscribe to newClassChannel("Testing", 123) on brokerC;
+
+--------
+
+use StudyParty1;
+SELECT VALUE m
+FROM newClassChannelSubscriptions as m
+where m.param1 = ###;
+
+--------
+
+------------------------
+------------------------
+???? 
+src/test/resources/metadata/queries/bad_cq/continuous_channel
+CREATE CONTINOUS CHANNEL newClassChannel newClassChannel(???) PERIOD duration ("PT1S")
+{SELECT FROM WHERE ??? };

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "studyparty2020",
+  "private_key_id": "6187c0224edd5d848acf425c1c75f7c548501573",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDD8JD4Q0eIVhTG\nfN0fML9PZ6SBPLqhd1D7ZsHuaSxmt4l5HC8vpEvqBeqbvBM251P0IQZ8DdYSl4yE\n5q2ypDsP/FJg0S/LlQ2NTfz8oTxkLjFp1du36Zj2Q6QQ4zMRnoOLgjT+UMp4FwBR\nzgIu3gkg06lywYs0kIPfXBvln74FvjL1Ml2zm+DfcwBLhmbGNErcHOf9QV7AHbFN\nFMBs1wUxvFbSjksDJbZmrnpHR95vLfUarf01+kyIYM4bz27Av5Q1eP0nnbGWkKak\nHpmM+Vj9q1dtcU0sG//LsQIfV2jdlBnhYsuC1tJzXRV+T+KW4dplRsTmJnVbwCZi\nzF0ZPkB/AgMBAAECggEABGVcS0WZ0D7mKRcvZX4UJ2A9j5dg3zMsbPIpkwNnDJ2S\nMau730dssJZrZLe70p/ZVqvQV8N+Xwe+uP3tPbRzjXCYGeCiQDYFiiW1cabdvP2l\nptM2d7zU7V7SdSfebccZpRf0ammTm/ggI2Bff3+vGBPHmccqgVu7VFfeWbDTdDt9\nycAFSw/sxJum+58KAUYoeSBARha7209gzAQDN6hGNw85hTQSDRvF47LcwALH/38T\nGAg/XjzBcQ5qkOwJ9Xq20oepvg9wZo3L2IVtUrx6IPGpGBdnqKjTOvZ4Maze9oxh\n/wRCma3cNaFMhpzbc31+4vBijgsyZbMtZRRSKebBMQKBgQDlbTGpp2KIFtOhnRUo\nXZq4hEYgPl8B4nOriif+EHhPySjLUeIrSsv1A2Tgon/wUqLMkY3dNZruQxCuOT9/\nVJ/T1coDbmXMpBy76iu1nK+h8Jb3+b5Ucjt4/dx5OEE7sxCpfkg3dCp3iRqkKE5b\nP1CfyQPR2swbqIVmXJiCW/8CSQKBgQDaonFYVdWrVc+Ns5qSrnKdb8xSc8iLwH0k\nOF3GMNCZUZNFFmuZzFiJeXFV0iGYZqTS6bJ7YgbcL2ZcPgny/QpmQh3HOMBf3r57\nh9+mN5eB/YEghnlidTGByrDBwOMb6ghObJPEh085v7Apu+jo9RaW/Lq1kRze6ZFh\n5umGbmOshwKBgQCS95X+tekagHTlbHjnOL8qQCGj+hBmZqfuVTw1Nlu70IK/bB7T\n2MA6ngf7Fl2al3UOUpdsAzDSPEftM2MHsDAKRUN5Wzj/FIoLnoCNgGfJ9xLemy9f\nbSXH5edcB7tSAO1Fhk3AqDukA0H7so4vSaneEajOv7hMZ3G9FsfjigcbcQKBgDS+\nL13CBzO4FcP3afiswNWeHMpfSCf+nbHZLzYanJgAB+kIyZhmpY00kNTFRnl/eY+v\n9PCy6zi+7pCeHsRRquqUVJ604CPAlm8yjg+JJbGkODxidHH+F51aCl4TbDZVtP9G\nTjeA9OnXhmXrAPsB9RsjiN84TKCx8/KMRBW8F6uNAoGBALDAfQ7PkVzvc3hsmobf\nCkU/gqs9JZl/lF/DMr5VdfzvFNnZML/N56vkjn+9UrK6x+5Q58FhB/oGHz9ZXnlq\nPSbiVdG3nmkOpHQeyTmmUvKbQ2LBo3BBL2KOQEqh82cQyDxJh2QjaW++2K9vRaJJ\n/MTR4d7vreQk6n5WVbSal8m+\n-----END PRIVATE KEY-----\n",
+  "client_email": "studyparty2020@studyparty2020.iam.gserviceaccount.com",
+  "client_id": "117122096905056039736",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/studyparty2020%40studyparty2020.iam.gserviceaccount.com"
+}

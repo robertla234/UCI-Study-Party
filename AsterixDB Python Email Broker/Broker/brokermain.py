@@ -48,8 +48,8 @@ class RequestHandler(BaseHTTPRequestHandler):
          results=recievedParts['results'][0]
          for key,value in results.items():
              print (key, value)
-         print(results['subscriptionID'])
-         sendingEmail.sendEmail("New class party was created!", )
+         print(results['subscriptionId'])
+         #sendingEmail.sendEmail("New class party was created!", )
 
           
         else:

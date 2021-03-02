@@ -38,7 +38,8 @@ CREATE DATASET Class (ClassType)
 
 CREATE BROKER brokerA at "http://127.0.0.1:8081";
 CREATE CONTINUOUS push CHANNEL NewClass(class, idNo) PERIOD duration ("PT2S"){
-    SELECT VALUE p, 
-    FROM Party p
-    WHERE is_new(p) AND contains (p.class, class)
+    SELECT p, u.email
+    FROM Party p, User u
+    WHERE is_new(p) AND contains (p.class, class) 
+    AND u.idNo = idNo
 };

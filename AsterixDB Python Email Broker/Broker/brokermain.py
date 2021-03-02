@@ -46,21 +46,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         if 'results' in recievedParts:
          print("RESULTS IN PARTS")
          results=recievedParts['results'][0]
-         for key,value in results.items():
-             print (key, value)
-         print(results['subscriptionId'])
-         #sendingEmail.sendEmail("New class party was created!", )
-
+         #for key,value in results.items():
+             #print (key, value)
+         sendingEmail.sendEmail(results['result'], results['subscriptionId'])
           
         else:
          print("RESULTS NOT IN PARTS")
          subscriptionIds= recievedParts['subscriptionIds']
          print(subscriptionIds)
-         for subscriptionId in subscriptionIds[0]:
-          if subscriptionId in usersEmaiAndChannel:
-              print(subscriptionId)
-           #sendingEmail.sendEmail2("New result is ready!",usersEmaiAndChannel[subscriptionId], "New data is available in your subscribed channel")        
-    
         
 def main():
     port = 8081

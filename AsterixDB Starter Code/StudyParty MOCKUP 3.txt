@@ -62,10 +62,3 @@ FROM newClassChannelSubscriptions as m
 where m.param1 = ###;
 
 --------
-
-------------------------
-------------------------
-???? 
-src/test/resources/metadata/queries/bad_cq/continuous_channel
-CREATE CONTINOUS CHANNEL newClassChannel newClassChannel(???) PERIOD duration ("PT1S")
-{SELECT FROM WHERE ??? };

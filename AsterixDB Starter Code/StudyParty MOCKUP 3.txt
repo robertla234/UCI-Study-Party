@@ -52,13 +52,13 @@ DROP Type ClassType if exists;
 --------
 
 use StudyParty1;
-subscribe to newClassChannel("Testing", 123) on brokerC;
+subscribe to NewClass("Testing", 123) on brokerA;
 
 --------
 
 use StudyParty1;
 SELECT VALUE m
-FROM newClassChannelSubscriptions as m
+FROM NewClassSubscriptions as m
 where m.param1 = ###;
 
 --------
